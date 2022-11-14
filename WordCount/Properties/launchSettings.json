@@ -2,7 +2,7 @@
   "profiles": {
     "WordCount": {
       "commandName": "Project",
-      "commandLineArgs": "\\TestFolder\\TestFolder2 .txt"
+      "commandLineArgs": "\\TestFolder\\TestFolder2 .cs"
     }
   }
 }

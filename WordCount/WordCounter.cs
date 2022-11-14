@@ -11,19 +11,19 @@ namespace WordCount
         public static void Print(string path, string fileExtension)
         {
             Dictionary<string, int> stats = new Dictionary<string, int>();
-
-            List<string> files = AddFilesRecursive(new List<string>(), path, fileExtension);
+            string[] files = Directory.GetFiles(path, "*" + fileExtension, SearchOption.AllDirectories);
 
             foreach (string file in files)
             {
                 byte[] byteArray = File.ReadAllBytes(file);
-                string text = Encoding.Default.GetString(byteArray);
-                char[] chars = { ' ', '.', ',', ';', ':', '(', ')', '-', '?', '!', 
-                    '\n', '\r', '\"', '\'', '*', '/', '<', '@', '#', '[', ']', '_', 
-                    '$', '~', '=', '<', '>', '%', '+' };
+                string text = Encoding.UTF8.GetString(byteArray);
+
+                char[] separators = { ' ', '.', ',', ';', ':', '(', ')', '-', '?', '!', 
+                    '\n', '\r', '\t', '\"', '\'', '*', '/', '<', '@', '#', '[', ']', '_',
+                    '$', '~', '=', '<', '>', '%', '+', ';', '{', '}' };
 
                 // split words
-                string[] words = text.Split(chars);
+                string[] words = text.Split(separators);
 
                 // iterate over the words collection to count occurrences
                 foreach (string word in words)
@@ -62,9 +62,7 @@ namespace WordCount
 
                 foreach (var pair in orderedStats)
                 {
-                    string countWithWordString = $"  {pair.Value} {pair.Key}{Environment.NewLine}";
-                    byte[] countWithWordByte = new UTF8Encoding(true).GetBytes(countWithWordString);
-
+                    byte[] countWithWordByte = new UTF8Encoding(true).GetBytes($"  {pair.Value} {pair.Key}{Environment.NewLine}");
                     fs.Write(countWithWordByte, 0, countWithWordByte.Length);
                 }
             }
@@ -72,28 +70,6 @@ namespace WordCount
             {
                 Console.WriteLine(Ex.Message);
             }
-        }
-
-        private static List<string> AddFilesRecursive(List<string> files, string path, string fileExtension)
-        {
-            try
-            {
-                foreach (string f in Directory.GetFiles(path, "*" + fileExtension))
-                {
-                    files.Add(f);
-                }
-
-                foreach (string d in Directory.GetDirectories(path))
-                {
-                    files = AddFilesRecursive(files, d, fileExtension);
-                }
-            }
-            catch (Exception Ex)
-            {
-                Console.WriteLine(Ex.Message);
-            }
-
-            return files;
         }
     }
 }
