@@ -2,7 +2,7 @@
   "profiles": {
     "WordCount": {
       "commandName": "Project",
-      "commandLineArgs": "-r C:/test"
+      "commandLineArgs": "\\TestFolder\\TestFolder2 .txt"
     }
   }
 }

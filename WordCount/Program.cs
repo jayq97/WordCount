@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using WordCount;
 
 namespace MyApp // Note: actual namespace depends on the project name.
 {
@@ -6,52 +7,40 @@ namespace MyApp // Note: actual namespace depends on the project name.
     {
         static void Main(string[] args)
         {
+            string usage = "Usage: ./WordCount <directory-path> <file-extension>";
 
-            if (args.Length == 0)
+
+            if (args.Length < 2)
             {
-                Console.WriteLine("Missing Argukments");
+                Console.WriteLine($"Too few Arguments{Environment.NewLine}{usage}");
                 return;
             }
 
-            if (args.Length == 1)
-            {
-                if (args[0].ToLower() == "-r")
-                {
-                    Console.WriteLine("Missing Path");
-                    return;
-                }
-                if (!Directory.Exists(args[0])){
-                    Console.WriteLine("Path doesn't exist");
-                    return ;
-                }
-
-                // nicht rekusiv
-
-            }
             if (args.Length == 2)
             {
-                if(!args.Any(x => x.ToLower() == "-r"))
+                string path = "../../../../" + args[0];
+                string fileExtension = args[1];
+
+                if (!Directory.Exists(path))
                 {
-                    Console.WriteLine("Not correct Arguments");
+                    Console.WriteLine($"Path doesn't exist{Environment.NewLine}{usage}");
                     return;
                 }
 
-                string[] path = Array.FindAll(args, x => x.ToLower() != "-r" );
-
-                if (!Directory.Exists(path[0]))
+                if (!fileExtension.Trim().StartsWith("."))
                 {
-                    Console.WriteLine("Path doesn't exist");
+                    Console.WriteLine($"Invalid file extension{Environment.NewLine}{usage}");
                     return;
                 }
 
-                // Rekursiv
+                WordCounter.Print(path, fileExtension);
             }
+
             if (args.Length > 2)
             {
-                Console.WriteLine("To Many Arguments");
+                Console.WriteLine($"Too many Arguments{Environment.NewLine}{usage}");
                 return;
             }
-            Console.ReadKey();
         }
     }
 }
