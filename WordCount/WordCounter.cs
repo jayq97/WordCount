@@ -15,11 +15,15 @@ namespace WordCount
 
             foreach (string file in files)
             {
-                byte[] byteArray = File.ReadAllBytes(file);
-                string text = Encoding.UTF8.GetString(byteArray);
+                string text;
+
+                using (StreamReader reader = new StreamReader(file, Encoding.UTF8))
+                {
+                    text = reader.ReadToEnd();
+                }
 
                 char[] separators = { ' ', '.', ',', ';', ':', '(', ')', '-', '?', '!', 
-                    '\n', '\r', '\t', '\"', '\'', '*', '/', '<', '@', '#', '[', ']', '_',
+                    '\n', '\r', '\t', '\"', '\'', '\\', '*', '/', '<', '@', '#', '[', ']', '_',
                     '$', '~', '=', '<', '>', '%', '+', ';', '{', '}' };
 
                 // split words
@@ -28,15 +32,16 @@ namespace WordCount
                 // iterate over the words collection to count occurrences
                 foreach (string word in words)
                 {
-                    if (word.Length > 0)
+                    string wordToLower = word.ToLower();
+                    if (wordToLower.Length > 0)
                     {
-                        if (!stats.ContainsKey(word))
+                        if (!stats.ContainsKey(wordToLower))
                         {
-                            stats.Add(word, 1); // add new word to collection
+                            stats.Add(wordToLower, 1); // add new word to collection
                         }
                         else
                         {
-                            stats[word] += 1; // update word occurrence count
+                            stats[wordToLower] += 1; // update word occurrence count
                         }
                     }
                 }

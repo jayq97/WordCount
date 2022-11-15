@@ -9,10 +9,15 @@ namespace MyApp // Note: actual namespace depends on the project name.
         {
             string usage = "Usage: ./WordCount <directory-path> <file-extension>";
 
-
             if (args.Length < 2)
             {
                 Console.WriteLine($"Too few Arguments{Environment.NewLine}{usage}");
+                return;
+            }
+
+            if (args.Length > 2)
+            {
+                Console.WriteLine($"Too many Arguments{Environment.NewLine}{usage}");
                 return;
             }
 
@@ -34,12 +39,6 @@ namespace MyApp // Note: actual namespace depends on the project name.
                 }
 
                 WordCounter.Print(path, fileExtension);
-            }
-
-            if (args.Length > 2)
-            {
-                Console.WriteLine($"Too many Arguments{Environment.NewLine}{usage}");
-                return;
             }
         }
     }
