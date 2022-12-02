@@ -3,78 +3,38 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Linq;
 using System.Text;
+using System.Collections.Generic;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WordCount
 {
-    static class WordCounter
+    public class WordCounter
     {
-        public static void Print(string path, string fileExtension)
+        public static Dictionary<string, int> MapReduceWordsFromFiles(in string path, in string fileExtension)
         {
-            Dictionary<string, int> stats = new Dictionary<string, int>();
-            string[] files = Directory.GetFiles(path, "*" + fileExtension, SearchOption.AllDirectories);
-
-            foreach (string file in files)
-            {
-                string text;
-
-                using (StreamReader reader = new StreamReader(file, Encoding.UTF8))
-                {
-                    text = reader.ReadToEnd();
-                }
-
-                char[] separators = { ' ', '.', ',', ';', ':', '(', ')', '-', '?', '!', 
+            char[] separators = new[] { ' ', '.', ',', ';', ':', '(', ')', '-', '?', '!',
                     '\n', '\r', '\t', '\"', '\'', '\\', '*', '/', '<', '@', '#', '[', ']', '_',
                     '$', '~', '=', '<', '>', '%', '+', ';', '{', '}' };
 
-                // split words
-                string[] words = text.Split(separators);
+            var files = Directory.EnumerateFiles(path, "*" + fileExtension, SearchOption.AllDirectories).ToList();
 
-                // iterate over the words collection to count occurrences
-                foreach (string word in words)
-                {
-                    string wordToLower = word.ToLower();
-                    if (wordToLower.Length > 0)
-                    {
-                        if (!stats.ContainsKey(wordToLower))
-                        {
-                            stats.Add(wordToLower, 1); // add new word to collection
-                        }
-                        else
-                        {
-                            stats[wordToLower] += 1; // update word occurrence count
-                        }
-                    }
-                }
-            }
+            var stats = 
+                GetAllLinesFromFiles(files)
+                .SelectMany(line => line.Split(separators, StringSplitOptions.RemoveEmptyEntries))
+                .GroupBy(word => word)
+                .ToDictionary(group => group.Key, group => group.Count());
 
-            // order the collection by word count, and if word count is equal, then order alphabetically
-            var orderedStats = stats.OrderByDescending(x => x.Value).ThenByDescending(x => x.Key);
+            return stats;
+        }
 
-            try
+        private static IEnumerable<string> GetAllLinesFromFiles(in List<string> files)
+        {
+            List<string> lines = new();
+            files.ForEach(f =>
             {
-                string fileName = @"../../../../result.txt";
-
-                // Check if file already exists. If exists, delete it.     
-                if (File.Exists(fileName))
-                {
-                    File.Delete(fileName);
-                }
-
-                // Create new file     
-                using FileStream fs = File.Create(fileName);
-                byte[] totalWords = new UTF8Encoding(true).GetBytes($"Total word count: {stats.Count}{Environment.NewLine}");
-                fs.Write(totalWords, 0, totalWords.Length);
-
-                foreach (var pair in orderedStats)
-                {
-                    byte[] countWithWordByte = new UTF8Encoding(true).GetBytes($"  {pair.Value} {pair.Key}{Environment.NewLine}");
-                    fs.Write(countWithWordByte, 0, countWithWordByte.Length);
-                }
-            }
-            catch (Exception Ex)
-            {
-                Console.WriteLine(Ex.Message);
-            }
+                lines.AddRange(File.ReadAllLines(f).ToList());
+            });
+            return lines;
         }
     }
 }
