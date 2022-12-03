@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "WordCount": {
-      "commandName": "Project",
-      "commandLineArgs": "\\TestFolder\\TestFolder2 .cs"
-    }
-  }
-}

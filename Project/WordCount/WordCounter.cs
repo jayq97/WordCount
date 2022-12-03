@@ -16,10 +16,11 @@ namespace WordCount
                     '\n', '\r', '\t', '\"', '\'', '\\', '*', '/', '<', '@', '#', '[', ']', '_',
                     '$', '~', '=', '<', '>', '%', '+', ';', '{', '}' };
 
-            var files = Directory.EnumerateFiles(path, "*" + fileExtension, SearchOption.AllDirectories).ToList();
+            var files = Directory.EnumerateFiles(path, "*" + fileExtension, SearchOption.AllDirectories);
 
             var stats = 
-                GetAllLinesFromFiles(files)
+                GetAllLinesFromFiles(files.ToList())
+                .AsParallel()
                 .SelectMany(line => line.Split(separators, StringSplitOptions.RemoveEmptyEntries))
                 .GroupBy(word => word)
                 .ToDictionary(group => group.Key, group => group.Count());

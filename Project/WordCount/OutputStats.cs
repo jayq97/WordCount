@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,11 +40,13 @@ namespace WordCount
 
         public static void PrintToConsole(in Dictionary<string, int> stats)
         {
+            var sw = Stopwatch.StartNew();
             Console.WriteLine($"Total word count: {stats.Count}");
             foreach (var pair in stats.OrderByDescending(x => x.Value).ThenByDescending(x => x.Key))
             {
                 Console.WriteLine($"  {pair.Value} {pair.Key}");
             }
+            Console.WriteLine("Execution time = {0} seconds", sw.Elapsed.TotalSeconds);
         }
     }
 }
