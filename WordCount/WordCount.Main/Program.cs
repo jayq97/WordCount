@@ -9,12 +9,16 @@ namespace WordCount // Note: actual namespace depends on the project name.
         static string ArgumentStart(string fileextension) => 
             fileextension.StartsWith('.') ? fileextension : "." + fileextension;
 
-        private static void PrintLinesToConsole(in List<string> lines)
+        static readonly char[] separators = new[] { ' ', '.', ',', ';', ':', '(', ')', '-', '?', '!',
+                    '\n', '\r', '\t', '\"', '\'', '\\', '*', '/', '<', '@', '#', '[', ']', '_',
+                    '$', '~', '=', '<', '>', '%', '+', ';', '{', '}' };
+
+        private static void PrintLinesToConsole(in List<string> lines) // not pure due to void return value and I/O side effect
         {
             lines.ForEach(x => Console.WriteLine(x));
         }
 
-        private static void PrintToConsole(in Dictionary<string, int> stats, Stopwatch sw)
+        private static void PrintToConsole(in Dictionary<string, int> stats, in Stopwatch sw) // not pure due to void return value and I/O side effect
         {
             Console.WriteLine($"Total word count: {stats.Count}");
             foreach (var pair in stats.OrderByDescending(x => x.Value).ThenByDescending(x => x.Key))
@@ -24,7 +28,7 @@ namespace WordCount // Note: actual namespace depends on the project name.
             Console.WriteLine($"Execution time = {sw.Elapsed.TotalSeconds} seconds");
         }
 
-        private static readonly Func<List<string>, IEnumerable<string>> GetAllLinesFromFiles = (files) =>
+        private static readonly Func<List<string>, IEnumerable<string>> GetAllLinesFromFiles = (files) => // lambda expression
         {
             List<string> lines = new();
             files.ForEach(file =>
@@ -34,19 +38,12 @@ namespace WordCount // Note: actual namespace depends on the project name.
             return lines;
         };
 
-        private static readonly Func<string, string, Dictionary<string, int>> MapReduceWordsFromFiles = (string path, string fileExtension) =>
+        public static readonly Func<IEnumerable<string>, Dictionary<string, int>> MapReduceWordsFromFiles = (lines) => // lambda expression
         {
-            char[] separators = new[] { ' ', '.', ',', ';', ':', '(', ')', '-', '?', '!',
-                    '\n', '\r', '\t', '\"', '\'', '\\', '*', '/', '<', '@', '#', '[', ']', '_',
-                    '$', '~', '=', '<', '>', '%', '+', ';', '{', '}' };
-
-            var files = Directory.EnumerateFiles(path, "*" + fileExtension, SearchOption.AllDirectories);
-
-            var stats =
-                GetAllLinesFromFiles(files.ToList())
+            var stats = lines
                 .AsParallel()
                 .SelectMany(line => line.Split(separators, StringSplitOptions.RemoveEmptyEntries))
-                .GroupBy(word => word)
+                .GroupBy(word => word.ToLower())
                 .ToDictionary(group => group.Key, group => group.Count());
 
             return stats;
@@ -63,17 +60,19 @@ namespace WordCount // Note: actual namespace depends on the project name.
 
                 if (!Directory.Exists(path))
                 {
-                    PrintLinesToConsole(new List<string> { $"Path \"{path}\" doesn't exist", usage});
+                    PrintLinesToConsole(new List<string> { $"Path \"{path}\" doesn't exist", usage });
                     return;
                 }
 
-                var stats = MapReduceWordsFromFiles(path, fileExtension);
+                var files = Directory.EnumerateFiles(path, "*" + fileExtension, SearchOption.AllDirectories).ToList();
+                var lines = GetAllLinesFromFiles(files);
+                var stats = MapReduceWordsFromFiles(lines);
 
                 PrintToConsole(stats, sw);
             }
             else
             {
-                PrintLinesToConsole(new List<string> { $"Invalid count of arguments: {args.Length}", usage});
+                PrintLinesToConsole(new List<string> { $"Invalid count of arguments: {args.Length}", usage });
                 return;
             }
         }

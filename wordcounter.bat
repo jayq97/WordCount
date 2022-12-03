@@ -1,9 +1,8 @@
 @echo off
 
-title Word Counter batch script
-echo Welcome to Word Counter
+title Word Counter - Batch Ccript
 
-cd "WordCount\WordCount\bin\Debug\net6.0\"
-WordCount.exe ..\..\..\..\TestFolder .txt
+cd "WordCount\WordCount.Main\bin\Debug\net6.0"
+WordCount.Main.exe ../../../../TestFolder .txt
 
 pause
