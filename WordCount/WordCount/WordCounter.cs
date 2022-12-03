@@ -12,6 +12,7 @@ namespace WordCount
     {
         public static Dictionary<string, int> MapReduceWordsFromFiles(in string path, in string fileExtension)
         {
+
             char[] separators = new[] { ' ', '.', ',', ';', ':', '(', ')', '-', '?', '!',
                     '\n', '\r', '\t', '\"', '\'', '\\', '*', '/', '<', '@', '#', '[', ']', '_',
                     '$', '~', '=', '<', '>', '%', '+', ';', '{', '}' };

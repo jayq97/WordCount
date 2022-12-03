@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,11 +17,7 @@ namespace WordCount
                 string fileName = @"../../../../result.txt";
 
                 // Check if file already exists. If exists, delete it.     
-                if (File.Exists(fileName))
-                {
-                    File.Delete(fileName);
-                }
-
+                File.Delete(fileName);
                 // Create new file     
                 using FileStream fs = File.Create(fileName);
                 using StreamWriter sw = new StreamWriter(fs);
@@ -47,6 +44,11 @@ namespace WordCount
                 Console.WriteLine($"  {pair.Value} {pair.Key}");
             }
             Console.WriteLine("Execution time = {0} seconds", sw.Elapsed.TotalSeconds);
+        }
+
+        public static void PrintLinesToConsole(in string[] lines)
+        {
+            lines.ToList().ForEach(x => Console.WriteLine(x));
         }
     }
 }

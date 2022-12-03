@@ -5,43 +5,37 @@ using WordCount;
 
 namespace MyApp // Note: actual namespace depends on the project name.
 {
-    internal class Program
+    public class Program
     {
+        
         static void Main(string[] args)
         {
             const string usage = "Usage: ./WordCount <directory-path> <file-extension>";
 
             static bool ArgumentsCount(int a, int b) => a == b;
-            static bool ArgumentStartsWith(string a, string b) => a.StartsWith(b);
+            static string ArgumentStart(string fileextension) => (fileextension.StartsWith('.') ? fileextension : (fileextension = "." + fileextension));
+
 
             if (ArgumentsCount(args.Length, 2))
             {
-                string path = "../../../../" + args[0];
-                string fileExtension = args[1];
+                string path =  args[0];
+                string fileExtension = ArgumentStart(args[1]);
+
 
                 if (!Directory.Exists(path))
                 {
-                    Console.WriteLine($"Path \"{path}\" doesn't exist");
-                    Console.WriteLine(usage);
-                    return;
-                }
-
-                if (!ArgumentStartsWith(fileExtension, "."))
-                {
-                    Console.WriteLine($"Invalid file extension \"{fileExtension}\"");
-                    Console.WriteLine(usage);
+                    OutputStats.PrintLinesToConsole(new string[] { $"Path \"{path}\" doesn't exist",usage });
                     return;
                 }
 
                 var stats = WordCounter.MapReduceWordsFromFiles(path, fileExtension);
 
-                //OutputStats.WriteToTextFile(stats);
+                OutputStats.WriteToTextFile(stats);
                 OutputStats.PrintToConsole(stats);
             }
             else
             {
-                Console.WriteLine($"Invalid count of arguments: {args.Length}");
-                Console.WriteLine(usage);
+                OutputStats.PrintLinesToConsole(new string[] {$"Invalid count of arguments: {args.Length}", usage});
                 return;
             }
         }
