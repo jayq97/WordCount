@@ -4,16 +4,16 @@ namespace WordCount // Note: actual namespace depends on the project name.
 {
     public class Program
     {
-        //Usage shows how the exe should be executed 
+        //Usage shows how the .exe should be executed 
         const string usage = "Usage: ./WordCount <directory-path> <file-extension>";
 
-        //Lambda Checks if the given Argument is 2 Long
+        //Lambda Checks if the given Argument is 2 long
         static bool IsArgumentsCountTwo(int argCount) => argCount == 2;
         //Lambda Checks if the fileextenstion start with a dot 
         static string ArgumentStart(string fileextension) => 
             fileextension.StartsWith('.') ? fileextension : "." + fileextension;
 
-        // A Array of seperators to filter them
+        // An Char-Array of seperators to filter them
         static readonly char[] separators = new[] { ' ', '.', ',', ';', ':', '(', ')', '-', '?', '!',
                     '\n', '\r', '\t', '\"', '\'', '\\', '*', '/', '<', '@', '#', '[', ']', '_',
                     '$', '~', '=', '<', '>', '%', '+', ';', '{', '}' };
@@ -34,7 +34,7 @@ namespace WordCount // Note: actual namespace depends on the project name.
             Console.WriteLine($"Execution time = {sw.Elapsed.TotalSeconds} seconds");
         }
 
-        // Lambda Function to read all the lines from a File
+        // Lambda-function to read all the lines from a file
         private static readonly Func<List<string>, IEnumerable<string>> GetAllLinesFromFiles = (files) => // lambda expression
         {
             List<string> lines = new();
@@ -45,14 +45,14 @@ namespace WordCount // Note: actual namespace depends on the project name.
             return lines;
         };
 
-        // Lambda Function to Split the Lines of a File and Count the diffrent words
+        // Lambda-function to split the lines of a file and count the different words
         public static readonly Func<IEnumerable<string>, Dictionary<string, int>> MapReduceWordsFromFiles = (lines) => // lambda expression
         {
             var stats = lines
-                .AsParallel()
-                .SelectMany(line => line.Split(separators, StringSplitOptions.RemoveEmptyEntries))
-                .GroupBy(word => word.ToLower())
-                .ToDictionary(group => group.Key, group => group.Count());
+                .AsParallel() // Parallel execution
+                .SelectMany(line => line.Split(separators, StringSplitOptions.RemoveEmptyEntries)) // map to single words
+                .GroupBy(word => word.ToLower()) // group the words
+                .ToDictionary(group => group.Key, group => group.Count()); // create dictionary
 
             return stats;
         };
@@ -63,24 +63,25 @@ namespace WordCount // Note: actual namespace depends on the project name.
 
             if (IsArgumentsCountTwo(args.Length))
             {
-                //Path
-                string path =  args[0];
-                // Checking Fileextension
-                string fileExtension = ArgumentStart(args[1]);
+                string path =  args[0]; //Path
+                string fileExtension = ArgumentStart(args[1]); // Checking File-Extension
 
-                //Checking if Directory Exists
-                if (!Directory.Exists(path))
+                if (!Directory.Exists(path)) //Checking if directory exists
                 {
                     PrintLinesToConsole(new List<string> { $"Path \"{path}\" doesn't exist", usage });
                     return;
                 }
-                // Getting all File Paths 
+
+                // Getting all file paths 
                 List<string> files = Directory.EnumerateFiles(path, "*" + fileExtension, SearchOption.AllDirectories).ToList();
-                // Getting every Line from Files
+
+                // Getting every line from files
                 IEnumerable<string> lines = GetAllLinesFromFiles(files);
-                // Getting all countet words
+
+                // Getting all counted words
                 var stats = MapReduceWordsFromFiles(lines);
-                // Printing to the Console
+
+                // Printing to the console
                 PrintToConsole(stats, sw);
             }
             else
